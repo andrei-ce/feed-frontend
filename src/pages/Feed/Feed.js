@@ -1,6 +1,4 @@
 import React, { Component, Fragment } from 'react';
-import openSocket from 'socket.io-client';
-
 import Post from '../../components/Feed/Post/Post';
 import Button from '../../components/Button/Button';
 import FeedEdit from '../../components/Feed/FeedEdit/FeedEdit';
@@ -38,53 +36,7 @@ class Feed extends Component {
       .catch(this.catchError);
 
     this.loadPosts();
-    const socket = openSocket('http://localhost:8080');
-    socket.on('posts', (data) => {
-      switch (data.action) {
-        case 'create':
-          this.addPost(data.post);
-          break;
-        case 'update':
-          this.updatePost(data.post);
-          break;
-        case 'delete':
-          this.loadPosts();
-          break;
-        default:
-          throw new Error('Post action not recognized by socket.');
-      }
-    });
   }
-
-  addPost = (post) => {
-    this.setState((prevState) => {
-      const updatedPosts = [...prevState.posts];
-      if (prevState.postPage === 1) {
-        if (prevState.posts.length >= 2) {
-          updatedPosts.pop();
-        }
-        updatedPosts.unshift(post);
-      }
-      return {
-        posts: updatedPosts,
-        totalPosts: prevState.totalPosts + 1,
-      };
-    });
-  };
-
-  updatePost = (post) => {
-    this.setState((prevState) => {
-      const updatedPosts = [...prevState.posts];
-      const updatedPostIndex = prevState.posts.findIndex((p) => p._id === post._id);
-      if (updatedPostIndex > -1) {
-        updatedPosts[updatedPostIndex] = post;
-      }
-
-      return {
-        posts: updatedPosts,
-      };
-    });
-  };
 
   loadPosts = (direction) => {
     if (direction) {
